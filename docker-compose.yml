@@ -1,16 +1,22 @@
-version: '2.1'
+version: '3.5'
 
 services:
   users-db:
     container_name: users-db
-    build: ./project/db
-    ports:
-        - 5435:5432  # expose ports - HOST:CONTAINER
+    image: postgres
+    expose:
+        - 5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     healthcheck:
-      test: exit 0
+      test: ["CMD", "exit", "0"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./project/db/sql-init:/docker-entrypoint-initdb.d:ro
 
   users-service:
     container_name: users-service
@@ -18,14 +24,12 @@ services:
     volumes:
       - '.:/usr/src/app'
     ports:
-      - 5001:5000 # expose ports - HOST:CONTAINER
+      - 5000:5000
     environment:
       - APP_SETTINGS=project.config.DevelopmentConfig
       - DATABASE_URL=postgres://postgres:postgres@users-db:5432/users_dev
       - DATABASE_TESTING_URL=postgres://postgres:postgres@users-db:5432/users_test
     depends_on:
-      users-db:
-        condition: service_healthy
+      - users-db
     links:
       - users-db
-

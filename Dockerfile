@@ -1,5 +1,8 @@
 FROM python:3.7-alpine
 
+# Dev dependencies
+RUN apk --no-cache add build-base postgresql-dev
+
 # set working directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

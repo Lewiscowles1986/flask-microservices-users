@@ -2,7 +2,7 @@
 
 This is just me messing around with http://testdriven.io take on microservices. 
 
-It will perhaps impact [CD2](https://github.com/CODESIGN2/) in the future.
+It will perhaps impact [CD2](https://github.com/CODESIGN2/) in the future. (It never did)
 
 # Notes
 
@@ -21,12 +21,24 @@ git clone git@github.com:Lewiscowles1986/flask-microservices-users.git
 docker-compose up -d --build
 
 # Rebuild DB command and test command
-docker-compose run users-service python manage.py recreate_db
-docker-compose run users-service python manage.py test
+docker-compose exec -it users-service python manage.py recreate_db
+docker-compose run --rm users-service python manage.py test
 
 ```
 
 ### Note
 
-This is pretty much copy->pasta, follow the tutorial at http://testdriven.io if you want to learn this stuff. The repo will probably be deleted at some point.
+This started out as pretty much copy->paste. Follow the tutorial at http://testdriven.io if you want to learn this stuff. The repo will probably be deleted at some point. 
+
+
+### Opinion (2 years later)
+It's pretty vanilla and I'm not sure I agree with everything the tutorial says to do.
+
+* Having healthchecks and using modern docker-compose and baking source-code into the image is a not awful deployment strategy, but it needs work.
+
+If you were to push the docker-image built to dockerhub, you should capture the SHA of your commit (could correspond to a release or tag) so that you're not reliant on `latest` and can experiment with different versions of micro-services. The easiest command to get started with that is `git rev-parse --verify HEAD`
+
+* SQLAlchemy is a hot mess and should not be used
+
+I currently work at a place that uses SQLAlchemy. It's slow, it makes surprises about behaviour easy and it encourages poor reasoning about systems that I've not seen with parametrized SQL.
 
